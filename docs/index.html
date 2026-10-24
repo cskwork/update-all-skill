@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>update-all: update every coding agent harness in one run</title>
+  <meta name="description" content="An agent skill that runs codex update, claude update, pi update, and agy update in one pass and prints a before/after version table with exact failures.">
+  <link rel="canonical" href="https://cskwork.github.io/update-all-skill/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="update-all: update every coding agent harness in one run">
+  <meta property="og:description" content="Snapshot, update, verify. One before/after version table for Codex, Claude Code, pi, and Antigravity CLI.">
+  <meta property="og:url" content="https://cskwork.github.io/update-all-skill/">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="wrap site-header__inner">
+      <a class="brand" href="./">update-all</a>
+      <nav aria-label="Primary">
+        <ul class="nav">
+          <li><a href="#commands">Commands</a></li>
+          <li><a href="#workflow">Workflow</a></li>
+          <li><a href="#report">Report</a></li>
+          <li><a href="#install">Install</a></li>
+          <li><a href="https://github.com/cskwork/update-all-skill">GitHub</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap">
+        <h1 id="hero-title" class="hero__title">Four harnesses.<br> One update run.</h1>
+        <p class="hero__lede">update-all is an agent skill. Say <code>/update-all</code> and your agent updates Codex, Claude Code, pi, and Antigravity CLI, then prints one before/after version table with every failure shown exactly.</p>
+
+        <div class="command" data-copy-block>
+          <pre class="command__text"><code id="clone-cmd">git clone https://github.com/cskwork/update-all-skill ~/.agents/skills/update-all</code></pre>
+          <button class="copy-btn" type="button" data-copy-target="clone-cmd" data-copy-label="clone command" hidden>Copy clone command</button>
+        </div>
+        <p class="copy-status" role="status" aria-live="polite" data-copy-status></p>
+
+        <ul class="hero__links">
+          <li><a class="link-strong" href="https://github.com/cskwork/update-all-skill/blob/main/SKILL.md">Read the skill instructions</a></li>
+          <li><a class="link-strong" href="https://github.com/cskwork/update-all-skill">View the repository</a></li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="commands" class="section" aria-labelledby="commands-title">
+      <div class="wrap">
+        <h2 id="commands-title" class="section__title">The ledger</h2>
+        <p class="section__lede">One updater per harness. Only harnesses found on <code>PATH</code> are touched.</p>
+        <ol class="ledger">
+          <li class="ledger__row">
+            <span class="ledger__name">Codex</span>
+            <code class="ledger__cmd">codex update</code>
+            <span class="ledger__note">Version read with <code>codex --version</code>.</span>
+          </li>
+          <li class="ledger__row">
+            <span class="ledger__name">Claude Code</span>
+            <code class="ledger__cmd">claude update</code>
+            <span class="ledger__note">Version read with <code>claude --version</code>.</span>
+          </li>
+          <li class="ledger__row">
+            <span class="ledger__name">pi</span>
+            <code class="ledger__cmd">pi update</code>
+            <span class="ledger__note">Runs <code>pi update --all</code> only when you explicitly ask to include extensions or packages.</span>
+          </li>
+          <li class="ledger__row">
+            <span class="ledger__name">Antigravity CLI</span>
+            <code class="ledger__cmd">agy update</code>
+            <span class="ledger__note">Version read with <code>agy --version</code>.</span>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="workflow" class="section section--forest" aria-labelledby="workflow-title">
+      <div class="wrap">
+        <h2 id="workflow-title" class="section__title">Three steps, every run</h2>
+        <ol class="steps">
+          <li class="steps__row">
+            <span class="steps__num" aria-hidden="true">01</span>
+            <h3 class="steps__title">Snapshot</h3>
+            <p class="steps__body"><code>command -v</code> checks each binary. Installed harnesses report <code>&lt;cli&gt; --version</code>. Missing ones are marked <strong>not installed</strong> and skipped. A failed version read is recorded with its exit code and stderr, never guessed.</p>
+          </li>
+          <li class="steps__row">
+            <span class="steps__num" aria-hidden="true">02</span>
+            <h3 class="steps__title">Update</h3>
+            <p class="steps__body">Each installed harness runs its own updater. One failure never stops the others, and the exact exit code and stderr are kept. Nothing is installed, no <code>sudo</code>, no fallback installers.</p>
+          </li>
+          <li class="steps__row">
+            <span class="steps__num" aria-hidden="true">03</span>
+            <h3 class="steps__title">Verify &amp; Report</h3>
+            <p class="steps__body"><code>--version</code> runs again for every originally installed harness, even after a failed update. One table comes back, with exact stderr for each failure below it.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="report" class="section" aria-labelledby="report-title">
+      <div class="wrap">
+        <h2 id="report-title" class="section__title">What comes back</h2>
+        <p class="section__lede"><strong>Illustrative example.</strong> These are not current or latest versions.</p>
+
+        <figure class="specimen">
+          <table class="report" role="table">
+            <caption class="report__caption">Illustrative update-all report (not current versions)</caption>
+            <thead role="rowgroup">
+              <tr role="row">
+                <th role="columnheader" scope="col">Harness</th>
+                <th role="columnheader" scope="col">Command</th>
+                <th role="columnheader" scope="col">Before</th>
+                <th role="columnheader" scope="col">After</th>
+                <th role="columnheader" scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody role="rowgroup">
+              <tr role="row">
+                <th role="rowheader" scope="row" data-label="Harness">Codex</th>
+                <td role="cell" data-label="Command"><code>codex update</code></td>
+                <td role="cell" data-label="Before">0.46.0</td>
+                <td role="cell" data-label="After">0.48.0</td>
+                <td role="cell" data-label="Status"><span class="status status--updated">updated</span></td>
+              </tr>
+              <tr role="row">
+                <th role="rowheader" scope="row" data-label="Harness">Claude Code</th>
+                <td role="cell" data-label="Command"><code>claude update</code></td>
+                <td role="cell" data-label="Before">2.0.14</td>
+                <td role="cell" data-label="After">2.0.14</td>
+                <td role="cell" data-label="Status"><span class="status status--unchanged">unchanged</span></td>
+              </tr>
+              <tr role="row">
+                <th role="rowheader" scope="row" data-label="Harness">pi</th>
+                <td role="cell" data-label="Command"><code>pi update</code></td>
+                <td role="cell" data-label="Before">0.9.2</td>
+                <td role="cell" data-label="After">0.9.2</td>
+                <td role="cell" data-label="Status"><span class="status status--failed">failed (exit 1)</span></td>
+              </tr>
+              <tr role="row">
+                <th role="rowheader" scope="row" data-label="Harness">Antigravity CLI</th>
+                <td role="cell" data-label="Command">—</td>
+                <td role="cell" data-label="Before">—</td>
+                <td role="cell" data-label="After">—</td>
+                <td role="cell" data-label="Status"><span class="status status--missing">not installed</span></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="stderr">
+            <p class="stderr__label">pi, update, exit 1</p>
+            <pre class="stderr__text"><code>Error: request to update server timed out after 30000 ms</code></pre>
+          </div>
+          <figcaption class="specimen__caption">Illustrative output. Failures carry exact stderr outside the table, labelled with harness, phase, and exit code.</figcaption>
+        </figure>
+
+        <dl class="rules">
+          <div class="rules__row">
+            <dt>updated / unchanged</dt>
+            <dd>The updater exited 0 and both version reads succeeded. Only then are versions compared.</dd>
+          </div>
+          <div class="rules__row">
+            <dt>failed (exit N)</dt>
+            <dd>The updater exited nonzero, or a version read failed. An updater failure stays failed even if the after version differs.</dd>
+          </div>
+          <div class="rules__row">
+            <dt>not installed</dt>
+            <dd>The binary was not found. Nothing runs, and the skill never installs it for you.</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <section id="install" class="section section--rule" aria-labelledby="install-title">
+      <div class="wrap">
+        <h2 id="install-title" class="section__title">Install and run</h2>
+
+        <div class="install">
+          <div class="install__row">
+            <h3 class="install__title">Clone into your skills directory</h3>
+            <pre class="install__code"><code>git clone https://github.com/cskwork/update-all-skill ~/.agents/skills/update-all</code></pre>
+            <p class="install__note">Needs an agent host that loads skills from <code>~/.agents/skills</code>, plus at least one supported harness on <code>PATH</code>.</p>
+          </div>
+
+          <div class="install__row">
+            <h3 class="install__title">Invoke it</h3>
+            <div class="command" data-copy-block>
+              <pre class="command__text"><code id="invoke-cmd">/update-all</code></pre>
+              <button class="copy-btn" type="button" data-copy-target="invoke-cmd" data-copy-label="invocation" hidden>Copy invocation</button>
+            </div>
+            <p class="copy-status" role="status" aria-live="polite" data-copy-status></p>
+            <p class="install__note">To include pi extensions and packages, ask for it explicitly, for example <code>/update-all including pi extensions</code>. Then <code>pi update --all</code> runs instead of <code>pi update</code>.</p>
+          </div>
+
+          <div class="install__row">
+            <h3 class="install__title">Optional: Hermes</h3>
+            <pre class="install__code"><code>mkdir -p ~/.hermes/skills
+ln -s ~/.agents/skills/update-all ~/.hermes/skills/update-all</code></pre>
+            <p class="install__note">The destination <code>~/.hermes/skills/update-all</code> must not exist before you link it.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap site-footer__inner">
+      <p>MIT License. Copyright (c) 2026 cskwork.</p>
+      <ul class="footer__links">
+        <li><a href="https://github.com/cskwork/update-all-skill">Repository</a></li>
+        <li><a href="https://github.com/cskwork/update-all-skill/blob/main/SKILL.md">SKILL.md</a></li>
+        <li><a href="https://github.com/cskwork/update-all-skill/blob/main/LICENSE">License</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var busy = false;
+      var buttons = document.querySelectorAll('[data-copy-target]');
+
+      function statusFor(btn) {
+        var block = btn.closest('[data-copy-block]');
+        var next = block && block.nextElementSibling;
+        return next && next.hasAttribute('data-copy-status') ? next : null;
+      }
+
+      // Clear first so a repeated identical message is announced again.
+      function announce(el, msg) {
+        if (!el) return;
+        el.textContent = '';
+        window.setTimeout(function () { el.textContent = msg; }, 50);
+      }
+
+      function selectText(node) {
+        var sel = window.getSelection && window.getSelection();
+        if (!sel) return;
+        var range = document.createRange();
+        range.selectNodeContents(node);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+
+      function setBusy(state) {
+        busy = state;
+        Array.prototype.forEach.call(buttons, function (b) {
+          if (state) b.setAttribute('aria-disabled', 'true');
+          else b.removeAttribute('aria-disabled');
+        });
+      }
+
+      Array.prototype.forEach.call(buttons, function (btn) {
+        var target = document.getElementById(btn.getAttribute('data-copy-target'));
+        if (!target) return;
+        btn.hidden = false;
+
+        btn.addEventListener('click', function () {
+          if (busy) return;
+          var label = btn.getAttribute('data-copy-label');
+          var status = statusFor(btn);
+          var failMsg = 'Copy failed. The ' + label + ' is selected; press Command+C or Ctrl+C to copy it.';
+
+          if (!navigator.clipboard || !navigator.clipboard.writeText) {
+            selectText(target);
+            announce(status, failMsg);
+            return;
+          }
+
+          setBusy(true);
+          navigator.clipboard.writeText(target.textContent).then(function () {
+            announce(status, 'Copied the ' + label + ' to your clipboard.');
+          }, function () {
+            selectText(target);
+            announce(status, failMsg);
+          }).then(function () {
+            setBusy(false);
+          });
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
